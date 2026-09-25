@@ -1,0 +1,104 @@
+======================================================================
+Q1 - Overall churn rate
+======================================================================
+SELECT COUNT(*) total_customers, SUM(CASE WHEN Churn='Yes' THEN 1 ELSE 0 END) churned_customers, ROUND(100.0*SUM(CASE WHEN Churn='Yes' THEN 1 ELSE 0 END)/COUNT(*),2) churn_rate_pct FROM customers;
+
+ total_customers  churned_customers  churn_rate_pct
+            7043               1869           26.54
+
+======================================================================
+Q2 - Churn rate by contract
+======================================================================
+SELECT Contract, COUNT(*) customers, SUM(CASE WHEN Churn='Yes' THEN 1 ELSE 0 END) churned, ROUND(100.0*SUM(CASE WHEN Churn='Yes' THEN 1 ELSE 0 END)/COUNT(*),2) churn_rate_pct FROM customers GROUP BY Contract ORDER BY churn_rate_pct DESC;
+
+      Contract  customers  churned  churn_rate_pct
+Month-to-month       3875     1655           42.71
+      One year       1473      166           11.27
+      Two year       1695       48            2.83
+
+======================================================================
+Q3 - Churn by internet service
+======================================================================
+SELECT InternetService, COUNT(*) customers, ROUND(100.0*SUM(CASE WHEN Churn='Yes' THEN 1 ELSE 0 END)/COUNT(*),2) churn_rate_pct FROM customers GROUP BY InternetService ORDER BY churn_rate_pct DESC;
+
+InternetService  customers  churn_rate_pct
+    Fiber optic       3096           41.89
+            DSL       2421           18.96
+             No       1526            7.40
+
+======================================================================
+Q4 - Churn by tenure bucket
+======================================================================
+SELECT CASE WHEN tenure<=6 THEN '0-6 months' WHEN tenure<=12 THEN '7-12 months' WHEN tenure<=24 THEN '13-24 months' WHEN tenure<=48 THEN '25-48 months' ELSE '49+ months' END tenure_bucket, COUNT(*) customers, ROUND(100.0*SUM(CASE WHEN Churn='Yes' THEN 1 ELSE 0 END)/COUNT(*),2) churn_rate_pct FROM customers GROUP BY tenure_bucket ORDER BY MIN(tenure);
+
+tenure_bucket  customers  churn_rate_pct
+   0-6 months       1481           52.94
+  7-12 months        705           35.89
+ 13-24 months       1024           28.71
+ 25-48 months       1594           20.39
+   49+ months       2239            9.51
+
+======================================================================
+Q5 - Active customers with high-risk profile
+======================================================================
+SELECT customerID, tenure, Contract, MonthlyCharges, InternetService FROM customers WHERE Contract='Month-to-month' AND tenure<6 AND Churn='No' ORDER BY MonthlyCharges DESC LIMIT 10;
+
+customerID  tenure       Contract  MonthlyCharges InternetService
+5760-IFJOZ       3 Month-to-month          107.95     Fiber optic
+2081-VEYEH       3 Month-to-month          107.95     Fiber optic
+6734-GMPVK       5 Month-to-month          105.30     Fiber optic
+4132-KALRO       4 Month-to-month          100.85     Fiber optic
+7379-FNIUJ       2 Month-to-month          100.20     Fiber optic
+6645-MXQJT       2 Month-to-month           97.10     Fiber optic
+4566-NECEV       5 Month-to-month           96.55     Fiber optic
+1393-IMKZG       1 Month-to-month           95.85     Fiber optic
+4929-XIHVW       2 Month-to-month           95.50     Fiber optic
+2984-AFWNC       3 Month-to-month           95.40     Fiber optic
+
+======================================================================
+Q6 - Churn by payment method
+======================================================================
+SELECT PaymentMethod, COUNT(*) customers, ROUND(100.0*SUM(CASE WHEN Churn='Yes' THEN 1 ELSE 0 END)/COUNT(*),2) churn_rate_pct FROM customers GROUP BY PaymentMethod ORDER BY churn_rate_pct DESC;
+
+            PaymentMethod  customers  churn_rate_pct
+         Electronic check       2365           45.29
+             Mailed check       1612           19.11
+Bank transfer (automatic)       1544           16.71
+  Credit card (automatic)       1522           15.24
+
+======================================================================
+Q7 - Tech support and churn
+======================================================================
+SELECT TechSupport, COUNT(*) customers, ROUND(100.0*SUM(CASE WHEN Churn='Yes' THEN 1 ELSE 0 END)/COUNT(*),2) churn_rate_pct FROM customers WHERE InternetService!='No' GROUP BY TechSupport ORDER BY churn_rate_pct DESC;
+
+TechSupport  customers  churn_rate_pct
+         No       3473           41.64
+        Yes       2044           15.17
+
+======================================================================
+Q8 - Missing TotalCharges
+======================================================================
+SELECT customerID, tenure, MonthlyCharges, TotalCharges FROM customers WHERE TRIM(TotalCharges)='' OR TotalCharges IS NULL;
+
+customerID  tenure  MonthlyCharges TotalCharges
+4472-LVYGI       0           52.55             
+3115-CZMZD       0           20.25             
+5709-LVOEQ       0           80.85             
+4367-NUYAO       0           25.75             
+1371-DWPAZ       0           56.05             
+7644-OMVMY       0           19.85             
+3213-VVOLG       0           25.35             
+2520-SGTTA       0           20.00             
+2923-ARZLG       0           19.70             
+4075-WKNIU       0           73.35             
+2775-SEFEE       0           61.90             
+
+======================================================================
+Q9 - Duplicate customer IDs
+======================================================================
+SELECT customerID, COUNT(*) cnt FROM customers GROUP BY customerID HAVING COUNT(*)>1;
+
+Empty DataFrame
+Columns: [customerID, cnt]
+Index: []
+
