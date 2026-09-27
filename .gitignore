@@ -6,3 +6,5 @@ __pycache__/
 Thumbs.db
 .env
 sql/churn.db
+data/telco_churn_raw.csv
+data/telco_churn_cleaned.csv
