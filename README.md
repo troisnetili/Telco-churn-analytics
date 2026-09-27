@@ -25,6 +25,16 @@ A telecom business wants to understand why customers leave and identify active c
 
 These are descriptive relationships in this dataset; they should not be interpreted as proof that a particular service or contract directly causes churn.
 
+## What I'd try next
+
+The current model treats all customers the same, but churn drivers likely
+differ by segment — e.g. month-to-month customers churn for different
+reasons than two-year contract holders. A next step would be building
+segment-specific models (or adding contract-type interaction terms) rather
+than one model across the whole base. I'd also want to test whether
+`churn_risk_score` is well-calibrated (not just well-ranked) before using it
+to prioritize retention outreach — a high AUC doesn't guarantee the
+predicted probabilities themselves are trustworthy.
 ## Project structure
 
 ```text
